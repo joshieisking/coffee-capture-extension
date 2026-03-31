@@ -1,0 +1,13 @@
+{
+  "name": "coffee-capture-extension",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "shared",
+    "extension"
+  ],
+  "scripts": {
+    "build": "npm run build -w shared && npm run build -w extension",
+    "test": "npm run test -w shared && npm run test -w extension"
+  }
+}

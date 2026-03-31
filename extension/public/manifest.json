@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Coffee Capture",
+  "description": "Capture coffee shops from Google Maps, review the record, and save it after approval.",
+  "version": "0.1.0",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "tabs",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://www.google.com/*",
+    "https://maps.google.com/*",
+    "http://localhost:54321/*"
+  ],
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.google.com/maps/*",
+        "https://maps.google.com/*"
+      ],
+      "js": [
+        "assets/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_title": "Coffee Capture"
+  }
+}

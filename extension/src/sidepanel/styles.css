@@ -1,0 +1,172 @@
+:root {
+  color-scheme: light;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(218, 178, 104, 0.18), transparent 32%),
+    linear-gradient(180deg, #f6f1e8 0%, #efe7da 100%);
+  color: #2d2118;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 360px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app-shell {
+  padding: 18px;
+}
+
+.hero {
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #96653b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: "Iowan Old Style", "Georgia", serif;
+  font-size: 28px;
+}
+
+.hero__body {
+  margin: 8px 0 0;
+  color: #5c4939;
+  line-height: 1.5;
+}
+
+.panel,
+.callout {
+  border: 1px solid rgba(94, 65, 41, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 252, 247, 0.88);
+  box-shadow: 0 16px 40px rgba(86, 60, 38, 0.08);
+}
+
+.panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field__label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.field__hint {
+  color: #725944;
+  font-size: 12px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid #d8c6b2;
+  border-radius: 12px;
+  background: #fffdfa;
+  padding: 10px 12px;
+  color: #2d2118;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip,
+.button {
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.chip {
+  background: #ead8c0;
+  color: #503826;
+  padding: 8px 12px;
+}
+
+.chip--active {
+  background: #7a4b28;
+  color: #fff7ef;
+}
+
+.inline-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.button {
+  flex: 1;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #8b532f 0%, #5d3518 100%);
+  color: #fff8ef;
+  box-shadow: 0 12px 24px rgba(93, 53, 24, 0.24);
+}
+
+.button--secondary {
+  background: #efe2d0;
+  color: #4b3625;
+  box-shadow: none;
+}
+
+.callout {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+}
+
+.callout--warning {
+  background: rgba(255, 247, 220, 0.96);
+}
+
+.callout--error {
+  background: rgba(255, 237, 232, 0.98);
+}
+
+.link-button {
+  border: none;
+  background: transparent;
+  color: #7a4b28;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0;
+  text-decoration: underline;
+}
