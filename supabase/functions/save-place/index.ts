@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { corsHeaders } from "../_shared/cors.ts";
-import { badRequest, buildSourceHash, jsonResponse, readJson, validateSavePlaceRecord } from "../_shared/utils.ts";
+import { badRequest, buildSourceHash, isAuthorizedRequest, jsonResponse, readJson, unauthorized, validateSavePlaceRecord } from "../_shared/utils.ts";
 import type { NormalizedPlaceRecord } from "../_shared/types.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
@@ -38,6 +38,10 @@ function toCoffeeShopsRow(record: NormalizedPlaceRecord) {
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
+  }
+
+  if (!isAuthorizedRequest(request)) {
+    return unauthorized();
   }
 
   const payload = await readJson<{ record?: NormalizedPlaceRecord }>(request);

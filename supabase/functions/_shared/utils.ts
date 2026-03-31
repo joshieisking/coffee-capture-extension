@@ -4,6 +4,20 @@ export async function readJson<T>(request: Request): Promise<T> {
   return request.json() as Promise<T>;
 }
 
+export function isAuthorizedRequest(request: Request): boolean {
+  const expectedApiKey =
+    Deno.env.get("COFFEE_CAPTURE_SUPABASE_PUBLISHABLE_KEY") ??
+    Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ??
+    "";
+
+  if (!expectedApiKey) {
+    return true;
+  }
+
+  const apiKey = request.headers.get("apikey") ?? "";
+  return apiKey === expectedApiKey;
+}
+
 export function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -17,6 +31,10 @@ export function jsonResponse(body: unknown, status = 200): Response {
 
 export function badRequest(message: string): Response {
   return jsonResponse({ error: message }, 400);
+}
+
+export function unauthorized(): Response {
+  return jsonResponse({ error: "Unauthorized" }, 401);
 }
 
 export function validateResolvePlaceRequest(payload: ResolvePlaceRequest): string[] {

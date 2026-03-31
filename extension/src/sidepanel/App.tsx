@@ -26,6 +26,9 @@ export function App() {
   const [openingHoursText, setOpeningHoursText] = useState("{}");
   const [errors, setErrors] = useState<string[]>([]);
   const [status, setStatus] = useState("Waiting for a Google Maps place page...");
+  const [saveNotice, setSaveNotice] = useState<string>("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "success" | "error">("idle");
 
   useEffect(() => {
     const refreshReviewData = () => chrome.runtime.sendMessage(
@@ -35,12 +38,16 @@ export function App() {
         if (response.draft) {
           setDraft(response.draft);
           setOpeningHoursText(JSON.stringify(response.draft.opening_hours, null, 2));
-          setStatus("Draft captured from Google Maps.");
+          if (!saveNotice) {
+            setStatus("Draft captured from Google Maps.");
+          }
           return;
         }
 
         setOpeningHoursText("{}");
-        setStatus("Waiting for a Google Maps place page...");
+        if (!saveNotice) {
+          setStatus("Waiting for a Google Maps place page...");
+        }
       }
     );
 
@@ -56,6 +63,10 @@ export function App() {
       [field]: value
     };
     setDraft(nextDraft);
+    setSaveNotice("");
+    if (saveState !== "idle") {
+      setSaveState("idle");
+    }
     if (field === "opening_hours") {
       setOpeningHoursText(JSON.stringify(value, null, 2));
     }
@@ -107,18 +118,48 @@ export function App() {
     setErrors(nextErrors);
     if (nextErrors.length > 0) {
       setStatus("Fix validation errors before saving.");
+      setSaveNotice("");
+      setSaveState("error");
       return;
     }
 
     setStatus("Saving approved place...");
+    setSaveNotice("");
+    setIsSaving(true);
+    setSaveState("saving");
     chrome.runtime.sendMessage(
       {
         type: EXTENSION_MESSAGES.SAVE_APPROVED_PLACE,
         payload: toNormalizedPlaceRecord(draft)
       },
       (response: ReviewDataResponse) => {
+        setIsSaving(false);
         setReviewData(response);
-        setStatus(response.saveResult ? "Place saved successfully." : "Save failed.");
+        if (chrome.runtime.lastError) {
+          setStatus("Save failed.");
+          setSaveNotice(chrome.runtime.lastError.message);
+          setSaveState("error");
+          return;
+        }
+
+        if (response?.saveResult) {
+          const actionWord = response.saveResult.status === "updated" ? "Updated" : "Saved";
+          setStatus(response.saveResult.status === "updated" ? "Existing place updated." : "Place saved successfully.");
+          setSaveNotice(`${actionWord} record ${response.saveResult.id}.`);
+          setSaveState("success");
+          return;
+        }
+
+        if (response?.error) {
+          setStatus("Save failed.");
+          setSaveNotice(response.error);
+          setSaveState("error");
+          return;
+        }
+
+        setStatus("Save failed.");
+        setSaveNotice("No success response was returned.");
+        setSaveState("error");
       }
     );
   }
@@ -128,7 +169,10 @@ export function App() {
     setDraft(empty);
     setOpeningHoursText("{}");
     setErrors([]);
+    setSaveNotice("");
     setStatus("Draft cleared.");
+    setIsSaving(false);
+    setSaveState("idle");
     chrome.runtime.sendMessage({
       type: EXTENSION_MESSAGES.UPDATE_DRAFT,
       payload: empty
@@ -173,11 +217,19 @@ export function App() {
         <p className="eyebrow">Coffee Capture</p>
         <h1>Review Before Save</h1>
         <p className="hero__body">{status}</p>
+        {saveNotice ? <p className="hero__note">{saveNotice}</p> : null}
       </section>
 
       {reviewData.dedupe?.duplicate ? (
         <section className="callout callout--warning">
-          Possible duplicate: {reviewData.dedupe.match?.name ?? "existing record"}.
+          <strong>Possible duplicate found.</strong>
+          {" "}
+          This looks like
+          {" "}
+          <strong>{reviewData.dedupe.match?.name ?? "an existing record"}</strong>
+          .
+          {" "}
+          Saving may update the existing row instead of creating a new one.
         </section>
       ) : null}
 
@@ -297,8 +349,13 @@ export function App() {
           <button type="button" className="button button--secondary" onClick={handleCancel}>
             Cancel
           </button>
-          <button type="button" className="button" onClick={handleApprove}>
-            Approve & Save
+          <button
+            type="button"
+            className={`button button--primary button--${saveState}`}
+            onClick={handleApprove}
+            disabled={isSaving}
+          >
+            {isSaving ? "Saving..." : saveState === "success" ? "Saved" : "Approve & Save"}
           </button>
         </div>
       </section>

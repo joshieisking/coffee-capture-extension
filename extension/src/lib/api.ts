@@ -9,13 +9,15 @@ import type {
   SavePlaceResponse
 } from "@coffee-capture/shared";
 
-const API_BASE_URL = "http://localhost:54321/functions/v1";
+const API_BASE_URL = "https://xwennmuuanzfelsbnhpp.supabase.co/functions/v1";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_4b1ZGl9wZ5QhxGxTNNtU5A_5rNRvdBP";
 
 async function postJson<TResponse>(path: string, body: unknown): Promise<TResponse> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      apikey: SUPABASE_PUBLISHABLE_KEY
     },
     body: JSON.stringify(body)
   });
